@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 
@@ -29,8 +27,6 @@ public class Reader  implements Runnable {
     @Override
     public void run() {
         try {
-
-
 
                 try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 

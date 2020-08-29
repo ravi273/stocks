@@ -12,20 +12,22 @@ import java.util.concurrent.BlockingQueue;
 public class Aggregator implements Runnable{
 
     private final BlockingQueue<Trade> queue;
+    private List<Trade>  trades = new ArrayList<>();
+    private int sequenceNumber =0;
+    private long stratingTimeStamp = 0;
+    private Double max;
+    private Double min;
+    private Double open;
+    private Double volume;
+    private long interval = 5l;
 
-    public Aggregator(BlockingQueue<Trade> queue)
+    public Aggregator(BlockingQueue<Trade> queue, int interval)
     {
         this.queue =  queue;
+        this.interval = interval;
     }
 
-    List<Trade>  trades = new ArrayList<>();
-    int sequenceNumber =0;
-    long stratingTimeStamp = 0;
-    Double max;
-    Double min;
-    Double open;
-    Double volume;
-    long interval = 5l;
+
 
     @Override
     public void run() {
