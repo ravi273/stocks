@@ -9,6 +9,11 @@ import java.nio.file.Paths;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Stream;
 
+/*
+       First worker for the project
+       Responsible for reading the data from the Trades json file and pushing the same to Queue
+
+ */
 
 public class Reader  implements Runnable {
 
@@ -41,7 +46,10 @@ public class Reader  implements Runnable {
                             e.printStackTrace();
                         }
                         try {
+                            //Filtering records based on Symbol set in config.properties
                             if(symbol != null && trade !=null && symbol.equals(trade.getSym())) {
+
+                                //Converting TimeStamp2 from nanoseconds to seconds
                                 trade.setTs2(trade.getTs2()/1000000000);
                                 queue.put(trade);
                             }

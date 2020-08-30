@@ -7,7 +7,16 @@ import com.projects.upstox.entity.Trade;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
+
+/*
+    Aggregator Class is the second worker for the project.
+    Runs in its own thread.
+    Responsible for generating the OHLC data.
+    Produces output on the console.
+ */
+
 
 public class Aggregator implements Runnable{
 
@@ -20,6 +29,7 @@ public class Aggregator implements Runnable{
     private Double open;
     private Double volume;
     private long interval = 5L;
+    private  Double closingPrice;
 
     public Aggregator(BlockingQueue<Trade> queue, int interval)
     {
@@ -29,6 +39,12 @@ public class Aggregator implements Runnable{
 
 
 
+
+    /*
+       Iterates over all the elements present in the Queue
+       Runs in a Infinite loop
+       Once element is received sends to other methods for further processing
+    */
     @Override
     public void run() {
 
@@ -36,7 +52,20 @@ public class Aggregator implements Runnable{
     {
         try {
             Trade trade = queue.take();
-            Response response =  AddToList(trade);
+            List<Response> responses =  AddToList(trade);
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            if(responses!=null && responses.size()>0) {
+                for (Response response : responses) {
+                    try {
+                        System.out.println(objectMapper.writeValueAsString(response));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -44,29 +73,30 @@ public class Aggregator implements Runnable{
 
     }
 
-    private Response ProduceOutput(List<Trade> trades,Trade trade,boolean isClosing) {
 
-        Double closingPrice;
-        Response response = null;
+    /*
+        ProduceOutput
+        Generates a suitable response
+        Response is Produced when the bar closes
+        Generates an empty response if no trades were executed in the time frame of the bar
+     */
+    private List<Response> ProduceOutput(List<Trade> trades,Trade trade,boolean isClosing) {
+
+
+        Response response;
+        List<Response> responses = new ArrayList<>();
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         if(trades.size()>0)
         {
-
-
             if(isClosing) {
-                closingPrice = trade.getPrice();
                 response = new Response(open,max,min,closingPrice,volume,"ohlc_notify",trade.getSym(),sequenceNumber);
-                try {
-                    System.out.println(objectMapper.writeValueAsString(response));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                responses.add(response);
             }
         }
 
-        if(trade.getTs2()-stratingTimeStamp > 2*interval) {
+        if(trade.getTs2()-stratingTimeStamp >= 2*interval) {
             int numberofMissed_intervals = (int)((trade.getTs2() - stratingTimeStamp) / interval);
 
             for (int i = 0; i < numberofMissed_intervals; i++) {
@@ -75,21 +105,21 @@ public class Aggregator implements Runnable{
                 volume = 0.0;
                 max = 0.0;
                 min = 0.0;
-
-
-                try {
-                    System.out.println(objectMapper.writeValueAsString(response));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
+                responses.add(response);
             }
         }
 
-        return response;
+        return responses;
     }
 
-    public Response AddToList(Trade trade) {
-        Response response=null;
+
+    /*
+        Maintains a list with set of elemnts in the current bar inside  a list
+        Also manages the logic for open high close volume and sequens number
+     */
+
+    public List<Response> AddToList(Trade trade) {
+        List<Response> responses=null;
         boolean produceBlankOutput = false;
 
         if(trades.size()==0) {
@@ -106,28 +136,30 @@ public class Aggregator implements Runnable{
             if(trade.getTs2()- stratingTimeStamp < interval)
             {
                 trades.add(trade);
-                response = ProduceOutput(trades,trade,false);
+                responses = ProduceOutput(trades,trade,false);
                 if(trade.getPrice()>max)
                     max= trade.getPrice();
                 if(trade.getPrice()<min)
                     min = trade.getPrice();
                 volume += trade.getQ();
+                closingPrice = trade.getPrice();
             }
             else
             {
 
-                response = ProduceOutput(trades,trade,true);
+                responses = ProduceOutput(trades,trade,true);
                 sequenceNumber++;
                 stratingTimeStamp=trades.get(trades.size()-1).getTs2();
                 max= trade.getPrice();
                 min= trade.getPrice();
                 volume = trade.getQ();
+                closingPrice = trade.getQ();
                 trades.clear();
                 trades.add(trade);
 
             }
 
         }
-        return response;
+        return responses;
     }
 }

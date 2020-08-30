@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Trade {
 
 
+    public Trade()
+    {
+
+    }
+
     public Trade(String sym, String t, Double price, Double q, long ts, String side, long ts2) {
         this.sym = sym;
         this.t = t;

@@ -10,12 +10,17 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
+/*
+    Main class from where the application starts
+    Just Run the main method in this application to start
+ */
+
 
 public class App 
 {
     public static void main( String[] args )
     {
-        System.out.println( "Trade Streamin started" );
+        System.out.println( "Trade Streaming started" );
 
         final BlockingQueue<Trade> queue = new LinkedBlockingDeque<>();
 

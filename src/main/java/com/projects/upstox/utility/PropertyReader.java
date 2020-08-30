@@ -5,7 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+
+/*
+   Responsible for reading the properties from the properties file config.properties prsent in the resourcse folder
+
+ */
 public class PropertyReader {
+
 
     public Properties getPropValues() throws IOException {
 
