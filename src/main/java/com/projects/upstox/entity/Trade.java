@@ -5,6 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Trade {
 
+
+    public Trade(String sym, String t, Double price, Double q, long ts, String side, long ts2) {
+        this.sym = sym;
+        this.t = t;
+        this.price = price;
+        this.q = q;
+        this.ts = ts;
+        this.side = side;
+        this.ts2 = ts2;
+    }
+
     @JsonProperty("sym")
     private String sym;
 

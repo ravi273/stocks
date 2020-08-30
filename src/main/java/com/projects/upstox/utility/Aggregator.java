@@ -19,7 +19,7 @@ public class Aggregator implements Runnable{
     private Double min;
     private Double open;
     private Double volume;
-    private long interval = 5l;
+    private long interval = 5L;
 
     public Aggregator(BlockingQueue<Trade> queue, int interval)
     {
@@ -88,7 +88,7 @@ public class Aggregator implements Runnable{
         return response;
     }
 
-    private Response AddToList(Trade trade) {
+    public Response AddToList(Trade trade) {
         Response response=null;
         boolean produceBlankOutput = false;
 

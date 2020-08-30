@@ -41,8 +41,10 @@ public class Reader  implements Runnable {
                             e.printStackTrace();
                         }
                         try {
-                            if(symbol != null && symbol.equals(trade.getSym()))
-                            queue.put(trade);
+                            if(symbol != null && trade !=null && symbol.equals(trade.getSym())) {
+                                trade.setTs2(trade.getTs2()/1000000000);
+                                queue.put(trade);
+                            }
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
